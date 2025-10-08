@@ -20,18 +20,16 @@ export interface LoginRequest {
  */
 export interface AuthResponse {
   success: boolean;
-  token?: string;
-  user?: User;
+  player?: Player;
   message?: string;
 }
 
 /**
  * User data
  */
-export interface User {
+export interface Player {
   id: string;
   username: string;
-  email: string;
 }
 
 /**
@@ -39,8 +37,7 @@ export interface User {
  */
 export interface AuthState {
   isAuthenticated: boolean;
-  user: User | null;
-  token: string | null;
+  player: Player | null;
   loading: boolean;
   error: string | null;
 }

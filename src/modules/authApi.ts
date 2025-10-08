@@ -15,7 +15,7 @@ export const authApi = {
    */
   async register(data: RegisterRequest): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,14 +28,13 @@ export const authApi = {
       if (!response.ok) {
         return {
           success: false,
-          message: result.message || 'Registration failed',
+          message: result.error || 'Registration failed',
         };
       }
 
       return {
         success: true,
-        token: result.token,
-        user: result.user,
+        player: result.player,
       };
     } catch (error) {
       return {
@@ -50,7 +49,7 @@ export const authApi = {
    */
   async login(data: LoginRequest): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,14 +62,13 @@ export const authApi = {
       if (!response.ok) {
         return {
           success: false,
-          message: result.message || 'Login failed',
+          message: result.error || 'Login failed',
         };
       }
 
       return {
         success: true,
-        token: result.token,
-        user: result.user,
+        player: result.player,
       };
     } catch (error) {
       return {
@@ -83,13 +81,12 @@ export const authApi = {
   /**
    * Logout a player
    */
-  async logout(token: string): Promise<AuthResponse> {
+  async logout(): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      const response = await fetch(`${API_BASE_URL}/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -98,7 +95,7 @@ export const authApi = {
       if (!response.ok) {
         return {
           success: false,
-          message: result.message || 'Logout failed',
+          message: result.error || 'Logout failed',
         };
       }
 

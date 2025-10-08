@@ -20,8 +20,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
  * Local storage keys
  */
 const STORAGE_KEYS = {
-  TOKEN: 'city_builder_token',
-  USER: 'city_builder_user',
+  PLAYER: 'city_builder_user',  //todo: change value to the proper name of the project
 } as const;
 
 /**
@@ -38,8 +37,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [state, setState] = useState<AuthState>({
     isAuthenticated: false,
-    user: null,
-    token: null,
+    player: null,
     loading: true,
     error: null,
   });
@@ -48,22 +46,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Initialize auth state from local storage
    */
   useEffect(() => {
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    const userJson = localStorage.getItem(STORAGE_KEYS.USER);
+    const userJson = localStorage.getItem(STORAGE_KEYS.PLAYER);
     
-    if (token && userJson) {
+    if (userJson) {
       try {
         const user = JSON.parse(userJson);
         setState({
           isAuthenticated: true,
-          user,
-          token,
+          player: user,
           loading: false,
           error: null,
         });
       } catch {
-        localStorage.removeItem(STORAGE_KEYS.TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.USER);
+        localStorage.removeItem(STORAGE_KEYS.PLAYER);
         setState(prev => ({ ...prev, loading: false }));
       }
     } else {
@@ -79,14 +74,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     
     const response = await authApi.register(data);
     
-    if (response.success && response.token && response.user) {
-      localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
+    if (response.success  && response.player) {
+      localStorage.setItem(STORAGE_KEYS.PLAYER, JSON.stringify(response.player));
       
       setState({
-        isAuthenticated: true,
-        user: response.user,
-        token: response.token,
+        isAuthenticated: false,
+        player: null,
         loading: false,
         error: null,
       });
@@ -109,14 +102,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     
     const response = await authApi.login(data);
     
-    if (response.success && response.token && response.user) {
-      localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
+    if (response.success && response.player) {
+      localStorage.setItem(STORAGE_KEYS.PLAYER, JSON.stringify(response.player));
       
       setState({
         isAuthenticated: true,
-        user: response.user,
-        token: response.token,
+        player: response.player,
         loading: false,
         error: null,
       });
@@ -137,21 +128,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
-    if (state.token) {
-      await authApi.logout(state.token);
+    if (state.player) {
+      await authApi.logout();
     }
     
-    localStorage.removeItem(STORAGE_KEYS.TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER);
+    localStorage.removeItem(STORAGE_KEYS.PLAYER);
     
     setState({
       isAuthenticated: false,
-      user: null,
-      token: null,
+      player: null,
       loading: false,
       error: null,
     });
-  }, [state.token]);
+  }, [state.player]);
 
   return (
     <AuthContext.Provider value={{ ...state, register, login, logout }}>
