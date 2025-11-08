@@ -14,6 +14,22 @@ export function Home() {
     navigate('/login');
   };
 
+  const openWithGet = (url: string, params: any) => {
+    window.open(url + "?token=" + params, "_blank");
+  }
+
+  const handleGame = async () => {
+    const authToken = getCookie('auth_token');
+    openWithGet(GAME_BASE_URL, authToken);
+  };
+
+  const getCookie = (name: string): string | null => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+    return null;
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="home-container">
@@ -51,6 +67,9 @@ export function Home() {
             <li>Leaderboards</li>
           </ul>
         </div>
+        <button onClick={handleGame} className="btn-primary">
+          Play Game
+        </button>
         <button onClick={handleLogout} className="btn-danger">
           Logout
         </button>

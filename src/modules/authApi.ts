@@ -1,11 +1,6 @@
 import type { RegisterRequest, LoginRequest, AuthResponse } from '../types/auth';
 
 /**
- * API configuration
- */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ' http://localhost:5000';
-
-/**
  * Authentication API Module
  * Handles all authentication-related API calls
  */
@@ -21,6 +16,7 @@ export const authApi = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
 
       const result = await response.json();
@@ -55,6 +51,7 @@ export const authApi = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
 
       const result = await response.json();
@@ -88,6 +85,7 @@ export const authApi = {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
       const result = await response.json();
