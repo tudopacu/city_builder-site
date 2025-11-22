@@ -1,5 +1,6 @@
 import { useAuth } from '../contexts/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { GAME_BASE_URL } from '../config/config.ts';
 
 /**
  * Home Component Module

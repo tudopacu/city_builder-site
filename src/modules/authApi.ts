@@ -1,5 +1,7 @@
 import type { RegisterRequest, LoginRequest, AuthResponse } from '../types/auth';
 
+import { API_BASE_URL } from '../config/config.ts';
+
 /**
  * Authentication API Module
  * Handles all authentication-related API calls
@@ -10,7 +12,7 @@ export const authApi = {
    */
   async register(data: RegisterRequest): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await fetch(API_BASE_URL + `/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +47,7 @@ export const authApi = {
    */
   async login(data: LoginRequest): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await fetch(API_BASE_URL + `/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +82,7 @@ export const authApi = {
    */
   async logout(): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/logout`, {
+      const response = await fetch(API_BASE_URL + `/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
