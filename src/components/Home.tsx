@@ -1,13 +1,14 @@
 import { useAuth } from '../contexts/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { GAME_BASE_URL } from '../config/config.ts';
+import { NewsFeed } from './NewsFeed';
 
 /**
  * Home Component Module
  * Main landing page for authenticated users
  */
 export function Home() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, player, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -15,7 +16,7 @@ export function Home() {
     navigate('/login');
   };
 
-  const openWithGet = (url: string, params: any) => {
+  const openWithGet = (url: string, params: string | null) => {
     window.open(url + "?token=" + params, "_blank");
   }
 
@@ -51,29 +52,33 @@ export function Home() {
   }
 
   return (
-    <div className="home-container">
-      <div className="home-card">
-        <h1>Welcome back, {user?.username}!</h1>
-        <p>Email: {user?.email}</p>
-        <div className="user-info">
-          <h2>Player Dashboard</h2>
-          <p>This is where your city building adventure begins!</p>
-          <p className="info-text">
-            Future features will include:
-          </p>
-          <ul>
-            <li>City management</li>
-            <li>Resource tracking</li>
-            <li>News and updates</li>
-            <li>Leaderboards</li>
-          </ul>
+    <div className="home-layout">
+      <div className="news-section">
+        <NewsFeed />
+      </div>
+      <div className="user-section">
+        <div className="home-card">
+          <h1>Welcome back, {player?.username}!</h1>
+          <div className="user-info">
+            <h2>Player Dashboard</h2>
+            <p>This is where your city building adventure begins!</p>
+            <p className="info-text">
+              Future features will include:
+            </p>
+            <ul>
+              <li>City management</li>
+              <li>Resource tracking</li>
+              <li>News and updates</li>
+              <li>Leaderboards</li>
+            </ul>
+          </div>
+          <button onClick={handleGame} className="btn-primary">
+            Play Game
+          </button>
+          <button onClick={handleLogout} className="btn-danger">
+            Logout
+          </button>
         </div>
-        <button onClick={handleGame} className="btn-primary">
-          Play Game
-        </button>
-        <button onClick={handleLogout} className="btn-danger">
-          Logout
-        </button>
       </div>
     </div>
   );
