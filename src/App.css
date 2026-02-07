@@ -26,6 +26,64 @@ body {
 .app {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
+}
+
+/* Top Menu styles */
+.top-menu {
+  width: 100%;
+  padding: 20px;
+}
+
+.top-menu-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.top-menu-button {
+  padding: 16px 24px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 0;
+}
+
+.top-menu-button:first-child {
+  border-left: none;
+}
+
+.top-menu-button:last-child {
+  border-right: none;
+}
+
+.top-menu-button:hover {
+  background: rgba(100, 108, 255, 0.2);
+  color: #fff;
+}
+
+.top-menu-button:active {
+  background: rgba(100, 108, 255, 0.3);
+}
+
+/* App content area */
+.app-content {
+  flex: 1;
+  display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
