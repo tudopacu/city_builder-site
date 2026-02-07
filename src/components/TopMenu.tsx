@@ -1,16 +1,17 @@
+const menuItems = [
+  { label: 'Home', path: '/' },
+  { label: 'Tutorials', path: '/tutorials' },
+  { label: 'Forum', path: '/forum' },
+  { label: 'Help', path: '/help' },
+  { label: 'Media', path: '/media' },
+  { label: 'Wiki', path: '/wiki' },
+];
+
 /**
  * TopMenu Component
  * Navigation menu that spans the entire width of the page
  */
 export function TopMenu() {
-  const menuItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Tutorials', path: '/tutorials' },
-    { label: 'Forum', path: '/forum' },
-    { label: 'Help', path: '/help' },
-    { label: 'Media', path: '/media' },
-    { label: 'Wiki', path: '/wiki' },
-  ];
 
   return (
     <nav className="top-menu">
