@@ -28,7 +28,7 @@ export function NewsItem({ item }: NewsItemProps) {
       </div>
       <div className="news-item-content">
         <h3 className="news-item-title">{item.title}</h3>
-        <p className="news-item-date">{formatDate(item.createdAt)}</p>
+        <p className="news-item-date">{formatDate(item.create_at)}</p>
         <p className="news-item-text">{item.content}</p>
       </div>
     </div>

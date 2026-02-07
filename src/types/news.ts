@@ -6,7 +6,7 @@ export interface NewsItem {
   title: string;
   content: string;
   imageUrl: string;
-  createdAt: string;
+  create_at: string;
 }
 
 /**
