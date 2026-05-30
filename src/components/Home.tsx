@@ -72,12 +72,14 @@ export function Home() {
               <li>Leaderboards</li>
             </ul>
           </div>
-          <button onClick={handleGame} className="btn-primary">
-            Play Game
-          </button>
-          <button onClick={handleLogout} className="btn-danger">
-            Logout
-          </button>
+          <div className="user-actions">
+            <button onClick={handleGame} className="btn-primary">
+              Play Game
+            </button>
+            <button onClick={handleLogout} className="btn-danger">
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>
