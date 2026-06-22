@@ -11,6 +11,9 @@ env:
 jobs:
   build-and-deploy:
     runs-on: self-hosted # Triggers your new bare-metal worker agent
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
