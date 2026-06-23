@@ -47,7 +47,7 @@ export function Register() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>Register for City Builder</h1>
+        <h1>Register for City Builder2</h1>
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">Username</label>
