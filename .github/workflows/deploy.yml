@@ -1,4 +1,4 @@
-name: Deploy React Frontend
+name: Deploy Phaser 3 Game
 
 on:
   push:
@@ -10,10 +10,11 @@ env:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted # Triggers your new bare-metal worker agent
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,12 +34,14 @@ jobs:
           context: .
           push: true
           no-cache: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          # TAG REFACTOR: Swapped static :latest with the unique commit SHA
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Deploy to K8s Cluster
-        run: |
-          # 1. Force kill the old container to completely free up physical port 8082
-          kubectl scale deployment react-frontend-deployment --replicas=0
-          
-          # 2. Spin up the fresh container (this forces K8s to pull the new image from GHCR)
-          kubectl scale deployment react-frontend-deployment --replicas=1
+      # REFACTOR: Handoff cluster coordination directly to the infrastructure repository
+      - name: Notify Infrastructure Repo of New Image
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.INFRA_PAT }}
+          repository: tudopacu/city_builder-infrastructure
+          event-type: update-image
+          client-payload: '{"app": "phaser-game", "image": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"}'
