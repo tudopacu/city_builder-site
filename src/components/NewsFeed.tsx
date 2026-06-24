@@ -44,7 +44,7 @@ export function NewsFeed() {
   if (loading) {
     return (
       <div className="news-feed">
-        <h2>Latest News3</h2>
+        <h2>Latest News</h2>
         <p className="loading-message">Loading news...</p>
       </div>
     );
@@ -53,7 +53,7 @@ export function NewsFeed() {
   if (error) {
     return (
       <div className="news-feed">
-        <h2>Latest News3</h2>
+        <h2>Latest News</h2>
         <p className="error-message">{error}</p>
       </div>
     );
@@ -62,7 +62,7 @@ export function NewsFeed() {
   if (news.length === 0) {
     return (
       <div className="news-feed">
-        <h2>Latest News3</h2>
+        <h2>Latest News</h2>
         <p className="info-text">No news articles available at the moment.</p>
       </div>
     );
@@ -70,7 +70,7 @@ export function NewsFeed() {
 
   return (
     <div className="news-feed">
-      <h2>Latest News3</h2>
+      <h2>Latest News</h2>
       <div className="news-list">
         {news.map((item) => (
           <NewsItem key={item.id} item={item} />
