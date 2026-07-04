@@ -1,9 +1,9 @@
 /**
  * API configuration
  */
-export const API_BASE_URL = 'http://citybuilder.home.ro:8081';
+export const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 /**
  * Game configuration
  */
-export const GAME_BASE_URL = 'http://citybuilder.home.ro:8083';
+export const GAME_BASE_URL = import.meta.env.VITE_GAME_URL;
