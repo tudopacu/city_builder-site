@@ -211,7 +211,6 @@ button {
 .btn-danger {
   background: #f44336;
   color: white;
-  margin-top: 1rem;
 }
 
 .btn-danger:hover:not(:disabled) {
