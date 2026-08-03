@@ -98,7 +98,9 @@ cp .env.example .env
 
 Edit `.env` and set your API URL:
 ```
-VITE_API_BASE_URL=http://your-api-url/api
+VITE_API_URL=http://your-api-url/api
+VITE_GAME_URL=http://your-game-url
+VITE_CDN_URL=http://citybuilder.home.ro:8084/html
 ```
 
 ### Development

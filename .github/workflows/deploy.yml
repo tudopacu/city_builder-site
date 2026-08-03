@@ -38,6 +38,7 @@ jobs:
           build-args: |
             VITE_API_URL=http://citybuilder.home.ro:8081
             VITE_GAME_URL=http://citybuilder.home.ro:8083
+            VITE_CDN_URL=http://citybuilder.home.ro:8084/html
       - name: Notify Infrastructure Repo of New Image
         uses: peter-evans/repository-dispatch@v3
         with:

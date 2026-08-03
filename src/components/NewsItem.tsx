@@ -1,4 +1,5 @@
 import type { NewsItem as NewsItemType } from '../types/news';
+import { CDN_BASE_URL } from '../config/config';
 
 /**
  * NewsItem Component Props
@@ -21,10 +22,21 @@ export function NewsItem({ item }: NewsItemProps) {
     });
   };
 
+  const getImageUrl = (imageUrl: string) => {
+    if (!imageUrl || /^https?:\/\//i.test(imageUrl) || !CDN_BASE_URL) {
+      return imageUrl;
+    }
+
+    const normalizedBaseUrl = CDN_BASE_URL.replace(/\/+$/, '');
+    const normalizedImageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+
+    return `${normalizedBaseUrl}${normalizedImageUrl}`;
+  };
+
   return (
     <div className="news-item">
       <div className="news-item-image">
-        <img src={item.imageUrl} alt={item.title} />
+        <img src={getImageUrl(item.imageUrl)} alt={item.title} />
       </div>
       <div className="news-item-content">
         <h3 className="news-item-title">{item.title}</h3>
