@@ -5,8 +5,8 @@ export interface NewsItem {
   id: string;
   title: string;
   content: string;
-  imageUrl: string;
-  create_at: string;
+  image_url: string;
+  created_at: string;
 }
 
 /**

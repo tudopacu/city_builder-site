@@ -36,11 +36,11 @@ export function NewsItem({ item }: NewsItemProps) {
   return (
     <div className="news-item">
       <div className="news-item-image">
-        <img src={getImageUrl(item.imageUrl)} alt={item.title} />
+        <img src={getImageUrl(item.image_url)} alt={item.title} />
       </div>
       <div className="news-item-content">
         <h3 className="news-item-title">{item.title}</h3>
-        <p className="news-item-date">{formatDate(item.create_at)}</p>
+        <p className="news-item-date">{formatDate(item.created_at)}</p>
         <p className="news-item-text">{item.content}</p>
       </div>
     </div>
