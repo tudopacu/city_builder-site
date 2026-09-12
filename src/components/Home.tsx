@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useAuth } from '../contexts/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { GAME_BASE_URL } from '../config/config.ts';
@@ -8,29 +9,49 @@ import { NewsFeed } from './NewsFeed';
  * Main landing page for authenticated users
  */
 export function Home() {
-  const { isAuthenticated, player, logout } = useAuth();
+  const { isAuthenticated, player, logout, validateSession } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/login');
+    try {
+      await logout();
+    } finally {
+      navigate('/login');
+    }
   };
 
-  const openWithGet = (url: string, params: string | null) => {
+  const openWithGet = (url: string, params: string) => {
     window.open(url + "?token=" + params, "_blank");
   }
 
   const handleGame = async () => {
-    const authToken = getCookie('auth_token');
+    const authToken = validateSession();
+
+    if (!authToken) {
+      await handleLogout();
+      return;
+    }
     openWithGet(GAME_BASE_URL, authToken);
   };
 
-  const getCookie = (name: string): string | null => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
-    return null;
-  };
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const authToken = validateSession();
+
+    if (!authToken) {
+      void (async () => {
+        try {
+          await logout();
+        } finally {
+          navigate('/login');
+        }
+      })();
+    }
+  }, [isAuthenticated, logout, navigate, validateSession]);
 
   if (!isAuthenticated) {
     return (

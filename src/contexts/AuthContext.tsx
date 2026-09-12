@@ -9,6 +9,7 @@ export interface AuthContextType extends AuthState {
   register: (data: RegisterRequest) => Promise<boolean>;
   login: (data: LoginRequest) => Promise<boolean>;
   logout: () => Promise<void>;
+  validateSession: () => string | null;
 }
 
 /**
@@ -21,7 +22,20 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
  */
 const STORAGE_KEYS = {
   PLAYER: 'city_builder_user',  //todo: change value to the proper name of the project
+  LAST_LOGIN_AT: 'city_builder_last_login_at',
 } as const;
+
+const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()!.split(';').shift() || null;
+  }
+
+  return null;
+};
 
 /**
  * Authentication Provider Props
@@ -42,13 +56,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error: null,
   });
 
+  const validateSession = useCallback((): string | null => {
+    const userJson = localStorage.getItem(STORAGE_KEYS.PLAYER);
+    const lastLoginAt = localStorage.getItem(STORAGE_KEYS.LAST_LOGIN_AT);
+    const authToken = getCookie('auth_token');
+
+    if (!userJson || !lastLoginAt || !authToken) {
+      localStorage.removeItem(STORAGE_KEYS.PLAYER);
+      localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
+      setState(prev => ({
+        ...prev,
+        isAuthenticated: false,
+        player: null,
+        loading: false,
+      }));
+      return null;
+    }
+
+    const sessionAge = Date.now() - Number(lastLoginAt);
+
+    if (Number.isNaN(sessionAge) || sessionAge > SESSION_MAX_AGE_MS) {
+      localStorage.removeItem(STORAGE_KEYS.PLAYER);
+      localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
+      setState(prev => ({
+        ...prev,
+        isAuthenticated: false,
+        player: null,
+        loading: false,
+      }));
+      return null;
+    }
+
+    return authToken;
+  }, []);
+
   /**
    * Initialize auth state from local storage
    */
   useEffect(() => {
     const userJson = localStorage.getItem(STORAGE_KEYS.PLAYER);
     
-    if (userJson) {
+    if (validateSession() && userJson) {
       try {
         const user = JSON.parse(userJson);
         setState({
@@ -59,12 +107,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
       } catch {
         localStorage.removeItem(STORAGE_KEYS.PLAYER);
+        localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
         setState(prev => ({ ...prev, loading: false }));
       }
     } else {
       setState(prev => ({ ...prev, loading: false }));
     }
-  }, []);
+  }, [validateSession]);
 
   /**
    * Register a new player
@@ -104,6 +153,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     
     if (response.success && response.player) {
       localStorage.setItem(STORAGE_KEYS.PLAYER, JSON.stringify(response.player));
+      localStorage.setItem(STORAGE_KEYS.LAST_LOGIN_AT, Date.now().toString());
       
       setState({
         isAuthenticated: true,
@@ -127,12 +177,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const logout = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
-    
-    if (state.player) {
+
+    try {
       await authApi.logout();
+    } catch (error) {
+      void error;
     }
     
     localStorage.removeItem(STORAGE_KEYS.PLAYER);
+    localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
     
     setState({
       isAuthenticated: false,
@@ -140,10 +193,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       loading: false,
       error: null,
     });
-  }, [state.player]);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ ...state, register, login, logout }}>
+    <AuthContext.Provider value={{ ...state, register, login, logout, validateSession }}>
       {children}
     </AuthContext.Provider>
   );
