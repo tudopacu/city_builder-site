@@ -177,10 +177,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const logout = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
-    
-    if (state.player) {
+
+    try {
       await authApi.logout();
-    }
+    } catch {}
     
     localStorage.removeItem(STORAGE_KEYS.PLAYER);
     localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
@@ -191,7 +191,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       loading: false,
       error: null,
     });
-  }, [state.player]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ ...state, register, login, logout, validateSession }}>
