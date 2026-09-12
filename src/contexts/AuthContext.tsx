@@ -21,7 +21,26 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
  */
 const STORAGE_KEYS = {
   PLAYER: 'city_builder_user',  //todo: change value to the proper name of the project
+  LAST_LOGIN_AT: 'city_builder_last_login_at',
 } as const;
+
+const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()!.split(';').shift() || null;
+  }
+
+  return null;
+};
+
+const redirectToLoginIfNeeded = () => {
+  if (window.location.pathname !== '/login') {
+    window.location.replace('/login');
+  }
+};
 
 /**
  * Authentication Provider Props
@@ -47,10 +66,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   useEffect(() => {
     const userJson = localStorage.getItem(STORAGE_KEYS.PLAYER);
+    const lastLoginAt = localStorage.getItem(STORAGE_KEYS.LAST_LOGIN_AT);
+    const authToken = getCookie('auth_token');
+    const hadStoredSession = Boolean(userJson || lastLoginAt);
     
-    if (userJson) {
+    if (userJson && lastLoginAt && authToken) {
       try {
         const user = JSON.parse(userJson);
+        const sessionAge = Date.now() - Number(lastLoginAt);
+
+        if (Number.isNaN(sessionAge) || sessionAge > SESSION_MAX_AGE_MS) {
+          throw new Error('Session expired');
+        }
+
         setState({
           isAuthenticated: true,
           player: user,
@@ -59,10 +87,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
       } catch {
         localStorage.removeItem(STORAGE_KEYS.PLAYER);
+        localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
         setState(prev => ({ ...prev, loading: false }));
+
+        if (hadStoredSession) {
+          redirectToLoginIfNeeded();
+        }
       }
     } else {
+      localStorage.removeItem(STORAGE_KEYS.PLAYER);
+      localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
       setState(prev => ({ ...prev, loading: false }));
+
+      if (hadStoredSession) {
+        redirectToLoginIfNeeded();
+      }
     }
   }, []);
 
@@ -104,6 +143,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     
     if (response.success && response.player) {
       localStorage.setItem(STORAGE_KEYS.PLAYER, JSON.stringify(response.player));
+      localStorage.setItem(STORAGE_KEYS.LAST_LOGIN_AT, Date.now().toString());
       
       setState({
         isAuthenticated: true,
@@ -133,6 +173,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     
     localStorage.removeItem(STORAGE_KEYS.PLAYER);
+    localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
     
     setState({
       isAuthenticated: false,

@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
 import { useAuth } from '../contexts/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { GAME_BASE_URL } from '../config/config.ts';
 import { NewsFeed } from './NewsFeed';
+
+const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Home Component Module
@@ -22,6 +25,12 @@ export function Home() {
 
   const handleGame = async () => {
     const authToken = getCookie('auth_token');
+
+    if (!authToken) {
+      await handleLogout();
+      return;
+    }
+
     openWithGet(GAME_BASE_URL, authToken);
   };
 
@@ -31,6 +40,20 @@ export function Home() {
     if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
     return null;
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    const authToken = getCookie('auth_token');
+    const lastLoginAt = localStorage.getItem('city_builder_last_login_at');
+    const sessionAge = lastLoginAt ? Date.now() - Number(lastLoginAt) : Number.NaN;
+
+    if (!authToken || Number.isNaN(sessionAge) || sessionAge > SESSION_MAX_AGE_MS) {
+      void logout().then(() => navigate('/login'));
+    }
+  }, [isAuthenticated, logout, navigate]);
 
   if (!isAuthenticated) {
     return (
