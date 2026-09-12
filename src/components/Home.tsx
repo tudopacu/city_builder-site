@@ -39,7 +39,12 @@ export function Home() {
   };
 
   useEffect(() => {
-    if (!isAuthenticated || !validateSession()) {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (!validateSession()) {
       void logout().then(() => navigate('/login'));
     }
   }, [isAuthenticated, logout, navigate, validateSession]);
