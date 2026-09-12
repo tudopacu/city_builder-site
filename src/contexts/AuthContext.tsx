@@ -180,7 +180,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       await authApi.logout();
-    } catch {}
+    } catch (error) {
+      void error;
+    }
     
     localStorage.removeItem(STORAGE_KEYS.PLAYER);
     localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
