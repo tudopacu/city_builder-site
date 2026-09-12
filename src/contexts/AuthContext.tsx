@@ -9,6 +9,7 @@ export interface AuthContextType extends AuthState {
   register: (data: RegisterRequest) => Promise<boolean>;
   login: (data: LoginRequest) => Promise<boolean>;
   logout: () => Promise<void>;
+  validateSession: () => boolean;
 }
 
 /**
@@ -36,12 +37,6 @@ const getCookie = (name: string): string | null => {
   return null;
 };
 
-const redirectToLoginIfNeeded = () => {
-  if (window.location.pathname !== '/login') {
-    window.location.replace('/login');
-  }
-};
-
 /**
  * Authentication Provider Props
  */
@@ -61,24 +56,49 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error: null,
   });
 
+  const validateSession = useCallback((): boolean => {
+    const userJson = localStorage.getItem(STORAGE_KEYS.PLAYER);
+    const lastLoginAt = localStorage.getItem(STORAGE_KEYS.LAST_LOGIN_AT);
+    const authToken = getCookie('auth_token');
+
+    if (!userJson || !lastLoginAt || !authToken) {
+      localStorage.removeItem(STORAGE_KEYS.PLAYER);
+      localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
+      setState(prev => ({
+        ...prev,
+        isAuthenticated: false,
+        player: null,
+        loading: false,
+      }));
+      return false;
+    }
+
+    const sessionAge = Date.now() - Number(lastLoginAt);
+
+    if (Number.isNaN(sessionAge) || sessionAge > SESSION_MAX_AGE_MS) {
+      localStorage.removeItem(STORAGE_KEYS.PLAYER);
+      localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
+      setState(prev => ({
+        ...prev,
+        isAuthenticated: false,
+        player: null,
+        loading: false,
+      }));
+      return false;
+    }
+
+    return true;
+  }, []);
+
   /**
    * Initialize auth state from local storage
    */
   useEffect(() => {
     const userJson = localStorage.getItem(STORAGE_KEYS.PLAYER);
-    const lastLoginAt = localStorage.getItem(STORAGE_KEYS.LAST_LOGIN_AT);
-    const authToken = getCookie('auth_token');
-    const hadStoredSession = Boolean(userJson || lastLoginAt);
     
-    if (userJson && lastLoginAt && authToken) {
+    if (validateSession() && userJson) {
       try {
         const user = JSON.parse(userJson);
-        const sessionAge = Date.now() - Number(lastLoginAt);
-
-        if (Number.isNaN(sessionAge) || sessionAge > SESSION_MAX_AGE_MS) {
-          throw new Error('Session expired');
-        }
-
         setState({
           isAuthenticated: true,
           player: user,
@@ -89,21 +109,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.removeItem(STORAGE_KEYS.PLAYER);
         localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
         setState(prev => ({ ...prev, loading: false }));
-
-        if (hadStoredSession) {
-          redirectToLoginIfNeeded();
-        }
       }
     } else {
-      localStorage.removeItem(STORAGE_KEYS.PLAYER);
-      localStorage.removeItem(STORAGE_KEYS.LAST_LOGIN_AT);
       setState(prev => ({ ...prev, loading: false }));
-
-      if (hadStoredSession) {
-        redirectToLoginIfNeeded();
-      }
     }
-  }, []);
+  }, [validateSession]);
 
   /**
    * Register a new player
@@ -184,7 +194,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [state.player]);
 
   return (
-    <AuthContext.Provider value={{ ...state, register, login, logout }}>
+    <AuthContext.Provider value={{ ...state, register, login, logout, validateSession }}>
       {children}
     </AuthContext.Provider>
   );

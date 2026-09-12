@@ -4,14 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { GAME_BASE_URL } from '../config/config.ts';
 import { NewsFeed } from './NewsFeed';
 
-const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
-
 /**
  * Home Component Module
  * Main landing page for authenticated users
  */
 export function Home() {
-  const { isAuthenticated, player, logout } = useAuth();
+  const { isAuthenticated, player, logout, validateSession } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -24,13 +22,12 @@ export function Home() {
   }
 
   const handleGame = async () => {
-    const authToken = getCookie('auth_token');
-
-    if (!authToken) {
+    if (!validateSession()) {
       await handleLogout();
       return;
     }
 
+    const authToken = getCookie('auth_token');
     openWithGet(GAME_BASE_URL, authToken);
   };
 
@@ -42,18 +39,10 @@ export function Home() {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
-    const authToken = getCookie('auth_token');
-    const lastLoginAt = localStorage.getItem('city_builder_last_login_at');
-    const sessionAge = lastLoginAt ? Date.now() - Number(lastLoginAt) : Number.NaN;
-
-    if (!authToken || Number.isNaN(sessionAge) || sessionAge > SESSION_MAX_AGE_MS) {
+    if (!isAuthenticated || !validateSession()) {
       void logout().then(() => navigate('/login'));
     }
-  }, [isAuthenticated, logout, navigate]);
+  }, [isAuthenticated, logout, navigate, validateSession]);
 
   if (!isAuthenticated) {
     return (
