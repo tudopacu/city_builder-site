@@ -20,25 +20,18 @@ export function Home() {
     }
   };
 
-  const openWithGet = (url: string, params: string | null) => {
+  const openWithGet = (url: string, params: string) => {
     window.open(url + "?token=" + params, "_blank");
   }
 
   const handleGame = async () => {
-    if (!validateSession()) {
+    const authToken = validateSession();
+
+    if (!authToken) {
       await handleLogout();
       return;
     }
-
-    const authToken = getCookie('auth_token');
     openWithGet(GAME_BASE_URL, authToken);
-  };
-
-  const getCookie = (name: string): string | null => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
-    return null;
   };
 
   useEffect(() => {
@@ -47,7 +40,9 @@ export function Home() {
       return;
     }
 
-    if (!validateSession()) {
+    const authToken = validateSession();
+
+    if (!authToken) {
       void (async () => {
         try {
           await logout();

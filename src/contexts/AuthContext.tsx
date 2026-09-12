@@ -9,7 +9,7 @@ export interface AuthContextType extends AuthState {
   register: (data: RegisterRequest) => Promise<boolean>;
   login: (data: LoginRequest) => Promise<boolean>;
   logout: () => Promise<void>;
-  validateSession: () => boolean;
+  validateSession: () => string | null;
 }
 
 /**
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error: null,
   });
 
-  const validateSession = useCallback((): boolean => {
+  const validateSession = useCallback((): string | null => {
     const userJson = localStorage.getItem(STORAGE_KEYS.PLAYER);
     const lastLoginAt = localStorage.getItem(STORAGE_KEYS.LAST_LOGIN_AT);
     const authToken = getCookie('auth_token');
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         player: null,
         loading: false,
       }));
-      return false;
+      return null;
     }
 
     const sessionAge = Date.now() - Number(lastLoginAt);
@@ -84,10 +84,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         player: null,
         loading: false,
       }));
-      return false;
+      return null;
     }
 
-    return true;
+    return authToken;
   }, []);
 
   /**
