@@ -13,8 +13,11 @@ export function Home() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/login');
+    try {
+      await logout();
+    } finally {
+      navigate('/login');
+    }
   };
 
   const openWithGet = (url: string, params: string | null) => {
@@ -45,7 +48,13 @@ export function Home() {
     }
 
     if (!validateSession()) {
-      void logout().then(() => navigate('/login'));
+      void (async () => {
+        try {
+          await logout();
+        } finally {
+          navigate('/login');
+        }
+      })();
     }
   }, [isAuthenticated, logout, navigate, validateSession]);
 
