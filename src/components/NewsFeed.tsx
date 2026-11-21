@@ -3,6 +3,8 @@ import { newsApi } from '../modules/newsApi';
 import { NewsItem } from './NewsItem';
 import { Pagination } from './Pagination';
 import type { NewsItem as NewsItemType } from '../types/news';
+import templeColumn from '../assets/temple-column.jpg';
+import templeFronton from '../assets/temple-fronton.jpg';
 
 /**
  * NewsFeed Component
@@ -41,10 +43,25 @@ export function NewsFeed() {
     setCurrentPage(page);
   };
 
+  const templeTitle = (
+    <div className="news-temple-fronton">
+      <img className="news-temple-fronton-image" src={templeFronton} alt="" aria-hidden="true" />
+      <h2>Latest News</h2>
+    </div>
+  );
+
+  const templeArchitecture = (
+    <div className="news-temple-architecture" aria-hidden="true">
+      <img className="news-temple-column news-temple-column-left" src={templeColumn} alt="" />
+      <img className="news-temple-column news-temple-column-right" src={templeColumn} alt="" />
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="news-feed">
-        <h2>Latest News</h2>
+        {templeArchitecture}
+        {templeTitle}
         <p className="loading-message">Loading news...</p>
       </div>
     );
@@ -53,7 +70,8 @@ export function NewsFeed() {
   if (error) {
     return (
       <div className="news-feed">
-        <h2>Latest News</h2>
+        {templeArchitecture}
+        {templeTitle}
         <p className="error-message">{error}</p>
       </div>
     );
@@ -62,7 +80,8 @@ export function NewsFeed() {
   if (news.length === 0) {
     return (
       <div className="news-feed">
-        <h2>Latest News</h2>
+        {templeArchitecture}
+        {templeTitle}
         <p className="info-text">No news articles available at the moment.</p>
       </div>
     );
@@ -70,10 +89,11 @@ export function NewsFeed() {
 
   return (
     <div className="news-feed">
-      <h2>Latest News</h2>
+      {templeArchitecture}
+      {templeTitle}
       <div className="news-list">
-        {news.map((item) => (
-          <NewsItem key={item.id} item={item} />
+        {news.map((item, index) => (
+          <NewsItem key={item.id} item={item} isNewest={index === 0 && currentPage === 1} />
         ))}
       </div>
       <Pagination

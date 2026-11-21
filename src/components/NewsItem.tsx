@@ -6,13 +6,14 @@ import { CDN_BASE_URL } from '../config/config';
  */
 interface NewsItemProps {
   item: NewsItemType;
+  isNewest?: boolean;
 }
 
 /**
  * NewsItem Component
  * Displays a single news article with image on left and text on right
  */
-export function NewsItem({ item }: NewsItemProps) {
+export function NewsItem({ item, isNewest = false }: NewsItemProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -34,7 +35,7 @@ export function NewsItem({ item }: NewsItemProps) {
   };
 
   return (
-    <div className="news-item">
+    <div className={`news-item${isNewest ? ' news-item-newest' : ''}`}>
       <div className="news-item-image">
         <img src={getImageUrl(item.image_url)} alt={item.title} />
       </div>
