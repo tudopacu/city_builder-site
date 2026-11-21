@@ -34,10 +34,10 @@ body { min-height: 100vh; }
 /* Two-column layout for home page */
 .home-layout { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; gap: 20px; align-items: stretch; }
 
-.news-section { flex: 2; min-width: 0; display: flex; }
+.news-section { flex: 2; min-width: 0; display: flex; container-type: inline-size; }
 .user-section { flex: 1; min-width: 0; display: flex; }
 
-.auth-card, .home-card, .news-feed { background: linear-gradient(145deg, rgba(17,35,50,.91), rgba(11,21,31,.94)); border: 1px solid rgba(105,230,239,.43); border-radius: 12px; padding: 40px; box-shadow: inset 0 1px rgba(190,250,255,.15), 0 10px 38px rgba(0,0,0,.44), 0 0 26px rgba(26,206,224,.08); backdrop-filter: blur(8px); }
+.auth-card, .home-card { background: linear-gradient(145deg, rgba(17,35,50,.91), rgba(11,21,31,.94)); border: 1px solid rgba(105,230,239,.43); border-radius: 12px; padding: 40px; box-shadow: inset 0 1px rgba(190,250,255,.15), 0 10px 38px rgba(0,0,0,.44), 0 0 26px rgba(26,206,224,.08); backdrop-filter: blur(8px); }
 .home-layout .home-card, .home-layout .news-feed { width: 100%; height: 100%; }
 
 h1 { font-family: Georgia, serif; font-size: 2rem; margin-bottom: 1.5rem; text-align: center; color: #ffe1a2; text-shadow: 0 0 18px rgba(244,166,68,.32); }
@@ -164,18 +164,20 @@ button:disabled {
 }
 
 /* News feed styles */
-.news-feed { position: relative; padding: 204px 88px 42px; overflow: hidden; border: 1px solid #918363; border-radius: 4px; background: linear-gradient(110deg, #5d5b50, #323940 48%, #44433d); box-shadow: inset 0 0 0 2px rgba(236,217,171,.12), inset 0 18px 34px rgba(255,245,213,.06), 0 10px 38px rgba(0,0,0,.44); }
-.news-temple-architecture { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.news-temple-architecture::before { content: ""; position: absolute; top: 159px; left: 47px; right: 47px; height: 19px; border-top: 2px solid #dacba3; border-bottom: 5px solid #6d6350; background: linear-gradient(180deg, #d6c69c, #96896c 43%, #cdc19c 45%, #7a705c); box-shadow: 0 4px 8px rgba(0,0,0,.4); }
-.news-temple-column { position: absolute; top: 172px; bottom: 26px; width: 55px; border: 1px solid #554d3e; border-bottom: 9px solid #6b624f; border-radius: 2px 2px 0 0; box-shadow: inset 3px 0 rgba(255,248,211,.25), inset -5px 0 rgba(40,34,27,.48), 0 7px 11px rgba(0,0,0,.38); object-fit: cover; object-position: 48% center; filter: saturate(.68) sepia(.15) brightness(.88) contrast(1.1); }
-.news-temple-column-left { left: 16px; }
-.news-temple-column-right { right: 16px; transform: scaleX(-1); }
-.news-temple-fronton { position: absolute; z-index: 1; top: 0; left: 0; right: 0; height: 173px; display: flex; justify-content: center; align-items: flex-end; margin: 0; padding: 0 22px 22px; overflow: hidden; border-bottom: 5px solid #8e8063; background: linear-gradient(180deg, #a79875, #655d4c); box-shadow: 0 7px 0 rgba(42,39,33,.56), 0 10px 15px rgba(0,0,0,.3); }
-.news-temple-fronton-image { position: absolute; top: 5px; left: 6%; width: 88%; height: 143px; clip-path: polygon(50% 0, 100% 100%, 0 100%); object-fit: cover; object-position: 50% 5%; filter: saturate(.65) sepia(.18) brightness(.86) contrast(1.12); }
-.news-temple-fronton::before { content: ""; position: absolute; bottom: 9px; left: 7%; right: 7%; height: 22px; border-top: 2px solid #ead9ae; border-bottom: 2px solid #5b5140; background: repeating-linear-gradient(90deg, rgba(82,72,55,.38) 0 2px, transparent 2px 29px), linear-gradient(#cfc29e, #847861); box-shadow: inset 0 2px rgba(255,245,203,.46); }
-.news-temple-fronton::after { content: "✦"; position: absolute; bottom: 12px; z-index: 2; color: #715f3e; font-size: .92rem; text-shadow: 0 1px rgba(255,242,195,.65); }
-.news-temple-fronton h2 { position: relative; z-index: 3; margin: 0; padding: 7px 18px; border: 1px solid rgba(247,226,178,.65); border-radius: 2px; color: #fff0c9; background: rgba(47,48,42,.77); box-shadow: 0 2px 5px rgba(0,0,0,.42); font-family: Georgia, serif; font-size: 1.45rem; letter-spacing: .12em; text-transform: uppercase; text-shadow: 0 2px #433c31; }
-.news-feed > :not(.news-temple-architecture) { position: relative; z-index: 1; }
+/* News feed: the temple image is the section background. Its pediment, columns and steps are
+   border-image slices (1365x768 source: 300px top, 190px sides, 100px bottom), scaled with the
+   section width so the artwork keeps its proportions and the news sits inside the wall. */
+.news-feed {
+  --temple-scale: calc(100cqw / 1365);
+  border: solid transparent;
+  border-width: calc(300 * var(--temple-scale)) calc(190 * var(--temple-scale)) calc(100 * var(--temple-scale));
+  border-image: url("assets/temple.png") 300 190 100 fill stretch;
+  padding: 2.5rem 1.25rem .5rem;
+}
+
+/* Keep text that isn't a news card readable on the stone wall */
+.news-feed > :is(.loading-message, .error-message, .info-text), .news-feed .pagination { background: rgba(6,19,29,.78); border-radius: 8px; }
+.news-feed > .info-text, .news-feed .pagination { padding: .75rem 1rem; }
 
 .news-list {
   display: flex;
@@ -239,6 +241,14 @@ button:disabled {
 }
 
 .pagination-info { color: #bae8eb; font-size: .9rem; }
+
+/* Narrow screens: the temple columns leave little width, so stack each news card */
+@media (max-width: 600px) {
+  .news-feed { padding: 1.25rem 0 0; }
+  .news-item { flex-direction: column; }
+  .news-item-image { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+  .news-feed .pagination { gap: .5rem; padding: .5rem; }
+}
 @keyframes newest-entry { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes newest-signal { 50% { box-shadow: 0 0 0 4px rgba(255,185,75,0), 0 0 28px rgba(242,154,45,.26); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
