@@ -172,7 +172,7 @@ button:disabled {
   border: solid transparent;
   border-width: calc(300 * var(--temple-scale)) calc(190 * var(--temple-scale)) calc(100 * var(--temple-scale));
   border-image: url("assets/temple.png") 300 190 100 fill stretch;
-  padding: 1rem 1.25rem .5rem;
+  padding: 2.5rem 1.25rem .5rem;
 }
 
 /* Keep text that isn't a news card readable on the stone wall */
@@ -244,7 +244,7 @@ button:disabled {
 
 /* Narrow screens: the temple columns leave little width, so stack each news card */
 @media (max-width: 600px) {
-  .news-feed { padding: .5rem 0 0; }
+  .news-feed { padding: 1.25rem 0 0; }
   .news-item { flex-direction: column; }
   .news-item-image { width: 100%; height: auto; aspect-ratio: 3 / 2; }
   .news-feed .pagination { gap: .5rem; padding: .5rem; }
