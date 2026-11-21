@@ -74,9 +74,9 @@ export function Home() {
 
   return (
     <div className="home-layout">
-      <div className="news-section">
+      <section className="news-section" aria-label="Latest news">
         <NewsFeed />
-      </div>
+      </section>
       <div className="user-section">
         <div className="home-card">
           <h1>Welcome back, {player?.username}!</h1>
